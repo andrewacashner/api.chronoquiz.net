@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -87,7 +87,7 @@ DATABASES = {
         'ENGINE': 'mysql.connector.django',
 	'NAME': 'arcainfo_chronoquiz',
 	'USER': 'arcainfo_andrewacashner',
-    'PASSWORD': os.environ['MYSQL_PASSWORD'],
+    'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
 	'HOST': 'api.chronoquiz.net',
 	'PORT': '3306',
 	'OPTIONS': { 

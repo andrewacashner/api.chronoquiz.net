@@ -23,7 +23,7 @@ class Fact(models.Model):
     timeline = models.ForeignKey(Timeline, on_delete=models.CASCADE)
     date = models.IntegerField(default=0,null=True)
     info = models.CharField(max_length=120)
-    img = models.CharField(max_length=240, null=True, blank=True)
+    img = models.CharField(max_length=512, null=True, blank=True)
 
     class Meta:
         ordering = ['date']
