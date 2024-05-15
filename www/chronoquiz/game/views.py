@@ -111,9 +111,11 @@ class TimelineFull(APIView):
             action = "Create new" if created else "Updated"
 
 
-        facts_created = facts_updated = 0
+        facts_created = facts_updated = facts_deleted = 0
 
-        for event in user_timeline['facts']:
+        user_facts = user_timeline['facts']
+
+        for event in user_facts:
             if event['id'] == -1:
                 make_event = FactSerializer(data=event)
                 make_event.is_valid(raise_exception=True)
@@ -135,12 +137,25 @@ class TimelineFull(APIView):
                 else:
                     facts_updated += 1
 
+        # Delete facts that are in server-side list but not in client-side
+        # list
+        server_facts = Fact.objects.filter(user=request.user,
+                                           timeline=new_timeline)
+        if len(server_facts) != len(user_facts): 
+            client_fact_ids = {fact['id'] for fact in user_facts}
+            for server_fact in server_facts:
+                if server_fact.id not in client_fact_ids:
+                    server_fact.delete()
+                    facts_deleted += 1
+
         count = Fact.objects.filter(user=request.user, 
                                     timeline=new_timeline).count()
 
         return Response(f"{action} timeline '{user_timeline['title']}'"
-                        + f" with {count} items"
-                        + f" ({facts_created} new and {facts_updated} updated)")
+                        + f" with {count} items "
+                        + f"({facts_created} created, "
+                        + f"{facts_updated} updated, "
+                        + f"{facts_deleted} deleted)")
         
 
 
