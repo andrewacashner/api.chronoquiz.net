@@ -1,13 +1,12 @@
 import json
-from .models import User, Timeline, Fact 
 
+from .models import User, Timeline, Fact 
 from .serializers import UserSerializer, TimelineSerializer, FactSerializer, TimelineFullSerializer
+
 from django.http import Http404
+from rest_framework import viewsets, status, generics
 from rest_framework.views import APIView
-from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 
 class UserExists(APIView):
@@ -157,5 +156,25 @@ class TimelineFull(APIView):
                         + f"{facts_updated} updated, "
                         + f"{facts_deleted} deleted)")
         
+class Keywords(APIView):
+    permission_classes = (AllowAny,)
 
+    def get(self, request):
+        keywords = Timeline.objects.values_list('keywords', flat=True)
+        kw_filtered = list(filter(None, keywords))
+        kw_flattened = '; '.join(kw_filtered)
+        kw_list = kw_flattened.split('; ')
+        kw_sorted = sorted(list(set(kw_list)))
+        print(kw_sorted)
+
+        def timelines_by_keyword(keyword):
+            results = Timeline.objects.filter(keywords__contains=keyword)
+            ids = [{ 'id': result.id,
+                    'title': result.title } for result in results]
+            return (keyword, ids)
+
+        index = dict([timelines_by_keyword(kw) for kw in kw_sorted])
+        print(index)
+
+        return JsonResponse(index)
 
