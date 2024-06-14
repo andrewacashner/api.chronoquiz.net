@@ -3,7 +3,7 @@ import json
 from .models import User, Timeline, Fact 
 from .serializers import UserSerializer, TimelineSerializer, FactSerializer, TimelineFullSerializer
 
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from rest_framework import viewsets, status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
